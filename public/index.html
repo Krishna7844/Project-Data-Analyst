@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Data Analyst — Power BI-Style Analytics</title>
+    <meta name="description"
+        content="Upload CSV files, auto-clean data, detect relationships, and view Power BI-style dashboards with AI insights.">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css?v=2">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>DataAnalyst</span>
+            </div>
+            <nav>
+                <ul>
+                    <li class="active" data-target="upload-section" data-step="1">
+                        <i class="fa-solid fa-upload"></i> <span>Upload Data</span>
+                    </li>
+                    <li data-target="analysis-section" data-step="2" class="disabled">
+                        <i class="fa-solid fa-network-wired"></i> <span>Relationships</span>
+                    </li>
+                    <li data-target="dashboard-section" data-step="3" class="disabled">
+                        <i class="fa-solid fa-chart-pie"></i> <span>Dashboard</span>
+                    </li>
+                    <li data-target="ai-insights-section" data-step="4" class="disabled">
+                        <i class="fa-solid fa-gem"></i> <span>AI Insights</span>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="session-badge" id="session-badge" style="display:none;">
+                    <i class="fa-solid fa-fingerprint"></i>
+                    <span id="session-id-display"></span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Theme Toggle & Controls -->
+            <div class="theme-toggle-wrap">
+                <button id="reset-dashboard-btn" class="icon-btn" title="Reset Dashboard"
+                    style="display:none; margin-right: 15px;">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </button>
+                <i class="fa-solid fa-moon"></i>
+                <label class="theme-switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"></span>
+                </label>
+                <i class="fa-solid fa-sun"></i>
+            </div>
+            <!-- ═══════════ STEP 1: UPLOAD ═══════════ -->
+            <section id="upload-section" class="active-section">
+                <div class="section-header">
+                    <div class="step-badge">Step 1</div>
+                    <h1>Upload & Preprocess</h1>
+                    <p>Drag & drop your CSV files. We'll automatically clean, remove nulls, fix data types, and remove
+                        duplicates.</p>
+                </div>
+
+                <div class="card glass-card upload-container">
+                    <div class="drop-zone" id="drop-zone">
+                        <div class="drop-zone-inner">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <h3>Drop CSV files here</h3>
+                            <p>or <span class="browse-link">click to browse</span></p>
+                        </div>
+                        <input type="file" id="file-input" multiple accept=".csv" hidden>
+                    </div>
+
+                    <div id="file-list" class="file-list"></div>
+
+                    <button id="preprocess-btn" class="primary-btn" disabled>
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Clean & Preprocess
+                    </button>
+
+                    <div id="upload-status" class="status-message"></div>
+                </div>
+
+                <!-- Cleaning Reports (appear after preprocessing) -->
+                <div id="cleaning-reports" class="cleaning-reports" style="display:none;"></div>
+
+                <!-- Next Step Button -->
+                <button id="goto-step2-btn" class="primary-btn next-step-btn" style="display:none;">
+                    Analyze Relationships <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </section>
+
+            <!-- ═══════════ STEP 2: RELATIONSHIPS ═══════════ -->
+            <section id="analysis-section" class="hidden-section">
+                <div class="section-header">
+                    <div class="step-badge">Step 2</div>
+                    <h1>Data Relationships</h1>
+                    <p>Automatically detected connections between your datasets.</p>
+                </div>
+
+                <div class="card glass-card">
+                    <div class="loading-overlay" id="relationship-loader" style="display:none;">
+                        <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+                        <p>Detecting relationships...</p>
+                    </div>
+                    <div id="relationship-results"></div>
+                </div>
+
+                <button id="goto-step3-btn" class="primary-btn next-step-btn" style="display:none;">
+                    View Dashboard <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </section>
+
+            <!-- ═══════════ STEP 3: DASHBOARD ═══════════ -->
+            <section id="dashboard-section" class="hidden-section">
+                <div class="section-header">
+                    <div class="step-badge">Step 3</div>
+                    <h1>Interactive Dashboard</h1>
+                    <p>Power BI-style analytics dashboard generated from your data.</p>
+                </div>
+
+                <div class="loading-overlay" id="dashboard-loader" style="display:none;">
+                    <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+                    <p>Building dashboard...</p>
+                </div>
+
+                <!-- KPI Cards -->
+                <div class="kpi-grid" id="kpi-grid"></div>
+
+                <!-- Charts Grid -->
+                <div class="charts-grid" id="charts-grid"></div>
+
+                <!-- Data Preview Tables -->
+                <div id="tables-preview" class="tables-preview"></div>
+
+                <button id="goto-step4-btn" class="primary-btn next-step-btn" style="display:none;">
+                    Get AI Insights <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </section>
+
+            <!-- ═══════════ STEP 4: AI INSIGHTS ═══════════ -->
+            <section id="ai-insights-section" class="hidden-section">
+                <div class="section-header">
+                    <div class="step-badge">Step 4</div>
+                    <h1>AI-Powered Insights</h1>
+                    <p>Gemini AI analyzes your data and provides strategic business recommendations.</p>
+                </div>
+
+                <!-- Auto Summary Button -->
+                <div class="card glass-card">
+                    <h2><i class="fa-solid fa-bolt"></i> Quick Business Summary</h2>
+                    <p>Get an automatic comprehensive analysis of all your data — KPIs, strengths, weaknesses, and
+                        improvement strategies.</p>
+                    <button id="auto-summary-btn" class="primary-btn ai-btn">
+                        <i class="fa-solid fa-sparkles"></i> Generate Full Summary
+                    </button>
+                </div>
+
+                <!-- Custom Query -->
+                <div class="card glass-card" style="margin-top:1.5rem;">
+                    <h2><i class="fa-solid fa-magnifying-glass-chart"></i> Ask a Custom Question</h2>
+                    <textarea id="ai-query"
+                        placeholder="e.g., Which customer segments have the highest churn risk and what retention strategies would you recommend?"></textarea>
+                    <button id="ask-ai-btn" class="primary-btn ai-btn">
+                        <i class="fa-solid fa-robot"></i> Generate Insights
+                    </button>
+                </div>
+
+                <!-- AI Results -->
+                <div id="ai-results" class="ai-results-container" style="display:none;"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/ai.js"></script>
+</body>
+
+</html>
