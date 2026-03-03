@@ -672,16 +672,26 @@ section.active-section {
 
 .relationship-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
 }
 
 .rel-card {
   background: rgba(99, 102, 241, 0.06);
   border: 1px solid rgba(99, 102, 241, 0.15);
   border-radius: 12px;
-  padding: 1.25rem;
+  padding: 1.5rem;
   transition: var(--transition);
+  text-align: center;
+  /* Use flex column to stack everything neatly */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Prevent box from growing past its grid cell */
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .rel-card:hover {
@@ -699,50 +709,98 @@ section.active-section {
   border-radius: 6px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .rel-card .rel-tables {
+  /* Stack tables vertically to save horizontal space */
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  width: 100%;
 }
 
 .rel-card .table-name {
   background: rgba(255, 255, 255, 0.06);
-  padding: 0.3rem 0.7rem;
+  padding: 0.5rem 0.8rem;
   border-radius: 6px;
   font-size: 0.85rem;
   color: var(--text-secondary);
   font-weight: 500;
+  /* Ensure long names break and wrap to the next line */
+  white-space: normal;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .rel-card .rel-arrow {
   color: var(--primary-light);
   font-weight: 700;
+  /* Rotate arrow to point down for vertical stack */
+  transform: rotate(90deg);
+  margin: 0.2rem 0;
 }
 
 .rel-card .rel-key {
   font-size: 0.8rem;
   color: var(--text-muted);
-  margin-top: 0.25rem;
+  margin-bottom: 1rem;
+  width: 100%;
 }
 
 .rel-card .rel-key code {
+  display: block;
+  /* Make code block take its own line */
   background: rgba(99, 102, 241, 0.15);
-  padding: 0.15rem 0.4rem;
+  padding: 0.4rem;
   border-radius: 4px;
   color: var(--primary-light);
   font-family: 'Courier New', monospace;
+  margin-top: 0.4rem;
+  /* Allow scrolling only on this specific code block if key is insanely long */
+  overflow-x: auto;
+  white-space: nowrap;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Custom Scrollbar just for the code block */
+.rel-card .rel-key code::-webkit-scrollbar {
+  height: 4px;
+}
+
+.rel-card .rel-key code::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.rel-card .rel-key code::-webkit-scrollbar-thumb {
+  background: var(--primary-light);
+  border-radius: 2px;
 }
 
 .rel-meta {
   font-size: 0.75rem;
   color: var(--text-muted);
-  margin-top: 0.5rem;
-  display: flex;
-  gap: 1rem;
+  /* Use grid to neatly stack the 3 stats rows */
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.4rem;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0.8rem;
+  border-radius: 8px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.rel-meta span {
+  /* Allow stats text to wrap if needed */
+  white-space: normal;
+  word-break: break-word;
 }
 
 /* ═══════════ DASHBOARD KPIs ═══════════ */
@@ -813,13 +871,54 @@ section.active-section {
   border-radius: var(--card-radius);
   padding: 1.5rem;
   min-height: 320px;
+  display: flex;
+  flex-direction: column;
 }
 
-.chart-card h3 {
+.chart-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.chart-header h3 {
   font-size: 0.95rem;
   color: var(--text-secondary);
-  margin-bottom: 1rem;
   font-weight: 500;
+  margin: 0;
+}
+
+.chart-type-selector {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition);
+}
+
+.chart-type-selector:hover,
+.chart-type-selector:focus {
+  border-color: var(--primary-light);
+  color: var(--text-secondary);
+}
+
+.chart-type-selector option {
+  background: var(--main-bg);
+  color: var(--text-secondary);
+}
+
+.chart-container {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 /* ═══════════ DATA PREVIEW TABLES ═══════════ */

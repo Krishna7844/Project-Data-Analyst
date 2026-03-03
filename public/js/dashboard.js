@@ -93,12 +93,47 @@ window.loadDashboard = async function (filters = {}) {
         data.charts.forEach((chart, idx) => {
             const wrapper = document.createElement('div');
             wrapper.className = 'chart-card';
-            wrapper.innerHTML = `<h3>${chart.title}</h3><canvas id="chart-${idx}"></canvas>`;
+
+            // Inject header with chart selector dropdown and title
+            wrapper.innerHTML = `
+                <div class="chart-header">
+                    <select class="chart-type-selector" title="Change Chart Type" data-chart-index="${idx}">
+                        <option value="bar" ${chart.type === 'bar' ? 'selected' : ''}>Bar</option>
+                        <option value="line" ${chart.type === 'line' ? 'selected' : ''}>Line</option>
+                        <option value="pie" ${chart.type === 'pie' ? 'selected' : ''}>Pie</option>
+                        <option value="doughnut" ${chart.type === 'doughnut' ? 'selected' : ''}>Doughnut</option>
+                    </select>
+                    <h3>${chart.title}</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chart-${idx}"></canvas>
+                </div>
+            `;
             chartsGrid.appendChild(wrapper);
 
             const ctx = document.getElementById(`chart-${idx}`).getContext('2d');
-            const instance = createChart(ctx, chart);
+
+            // Store original data inside a wrapper object to allow re-rendering with exact same data
+            const chartDataState = { ...chart };
+            const instance = createChart(ctx, chartDataState);
             chartInstances.push(instance);
+
+            // Bind select dropdown to handle live type changes
+            const selector = wrapper.querySelector('.chart-type-selector');
+            selector.addEventListener('change', (e) => {
+                const newType = e.target.value;
+                const targetIdx = parseInt(e.target.dataset.chartIndex);
+
+                // Destroy old instance
+                chartInstances[targetIdx].destroy();
+
+                // Update type and re-create exactly in the same position
+                chartDataState.type = newType;
+
+                // The canvas DOM context doesn't die on destroy(), so we can reuse the same ctx
+                const newInstance = createChart(ctx, chartDataState);
+                chartInstances[targetIdx] = newInstance;
+            });
         });
 
         // ─── Data Preview Tables ─────────────────────
